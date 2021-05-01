@@ -2,8 +2,8 @@ package br.com.agendacontato.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
@@ -13,18 +13,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.mysql.cj.x.protobuf.MysqlxNotice.Warning.Level;
 
 import br.com.agendacontato.model.dao.ContatoDao;
 import br.com.agendacontato.model.entity.Contato;
 
 
 @WebServlet(urlPatterns = {"/ContatoController","/main", "/insert"})
-public class ContatoController extends HttpServlet {
-
+    public class ContatoController extends HttpServlet {
+	
 	private static final long serialVerionUID = 1L;
 	private Contato contato;
-	private ContatoDao contatoDao;
+	private ContatoDao contatoDao = null;
+	
 	public ContatoController() {
 		super();
 	}
@@ -39,16 +39,16 @@ public class ContatoController extends HttpServlet {
 	}
 	
 	protected void listaContatos(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException{
-		List<Contato> contatoList = new ArrayList<>();
-
-        try {
-            contatoList = contatoDao.findAll();
+		try {
+            contatoDao = new ContatoDao();
+            List<Contato> contatoList = contatoDao.findAll();
             request.setAttribute("contatos", contatoList);
             RequestDispatcher dispatcher = request.getRequestDispatcher("agenda.jsp");
             dispatcher.forward(request, response);
-        } catch (SQLException exception) {
+        } catch (SQLException | ClassNotFoundException exception) {
             Logger.getLogger(ContatoController.class.getName()).log(Level.SEVERE, null, exception);
         }
+
         response.sendRedirect("agenda.jsp");
 	}
 	protected void novoContatos(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
