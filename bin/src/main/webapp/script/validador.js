@@ -1,3 +1,4 @@
+
 function validar() {
     let nome = frmContato.nome.value;
     let fone = frmContato.fone.value;
@@ -13,4 +14,3 @@ function validar() {
     } else {
         document.forms["frmContato"].submit();
     }
-}
