@@ -2,12 +2,18 @@ package br.com.agendacontato.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.mysql.cj.x.protobuf.MysqlxNotice.Warning.Level;
 
 import br.com.agendacontato.model.dao.ContatoDao;
 import br.com.agendacontato.model.entity.Contato;
@@ -33,7 +39,17 @@ public class ContatoController extends HttpServlet {
 	}
 	
 	protected void listaContatos(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException{
-		response.sendRedirect("agenda.jsp");
+		List<Contato> contatoList = new ArrayList<>();
+
+        try {
+            contatoList = contatoDao.findAll();
+            request.setAttribute("contatos", contatoList);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("agenda.jsp");
+            dispatcher.forward(request, response);
+        } catch (SQLException exception) {
+            Logger.getLogger(ContatoController.class.getName()).log(Level.SEVERE, null, exception);
+        }
+        response.sendRedirect("agenda.jsp");
 	}
 	protected void novoContatos(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		contato = new Contato(request.getParameter("nome"), request.getParameter("fone"), request.getParameter("email"));
